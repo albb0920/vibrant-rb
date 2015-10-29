@@ -17,15 +17,11 @@ describe Vibrant::Vibrant do
     it 'white' do 
       expect(Vibrant::Vibrant.rgb2hsl(255,255,255)).to eq [0,0,100]
     end
-    it '#00ffff' do 
-      expect(Vibrant::Vibrant.rgb2hsl(0,255,255)).to eq [180,100,50]
+    it 'red' do 
+      expect(Vibrant::Vibrant.rgb2hsl(255,0,0)).to eq [0,0,100]
     end
   end
   
-  describe 'hue2rgb' do 
-
-  end
-  describe 'hsl2rgb' do 
-
-  end
+  describe 'hue2rgb'
+  describe 'hsl2rgb'
 end
