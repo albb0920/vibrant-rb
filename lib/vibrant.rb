@@ -71,7 +71,10 @@ module Vibrant
 
       img = Magick::Image.read(sourceImage)[0].quantize(@color_count)
       cmap = {}
+<<<<<<< HEAD
       # quality
+=======
+>>>>>>> cd0e6ae343bb25617695493da4a7aec0e1864ba7
       for y in 0...img.rows
         for x in 0...img.columns
           pixel = img.pixel_color(x, y) # 元画像のピクセルを取得
@@ -185,6 +188,7 @@ module Vibrant
     class << self
 
       def rgb2hsl(r, g, b)
+<<<<<<< HEAD
         r = r.to_f / 255.0
         g = g.to_f / 255.0
         b = b.to_f / 255.0
@@ -195,17 +199,31 @@ module Vibrant
         s = nil
         l = (max + min) / 2
 
+=======
+        r /= 255
+        g /= 255
+        b /= 255
+        max = [r,g,b].max
+        min = [r,g,b].min
+        h = nil
+        s = nil
+        l = (max + min) / 2
+>>>>>>> cd0e6ae343bb25617695493da4a7aec0e1864ba7
         if max == min
           h = s = 0
           # achromatic
         else
           d = max - min
+<<<<<<< HEAD
           s = if l > 0.5 
                 d / (2 - max - min) 
               else
                 d / (max + min)
               end
 
+=======
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+>>>>>>> cd0e6ae343bb25617695493da4a7aec0e1864ba7
           h = case max
                 when r
                   (g - b) / d + (g < b ? 6 : 0)
