@@ -69,7 +69,6 @@ module Vibrant
       @_swatches = []
 
       img = Magick::Image.read(sourceImage)[0].quantize(@color_count)
-      cmap = {}
       
       pixels = [] 
       for y in 0..img.rows
@@ -79,21 +78,24 @@ module Vibrant
       end
 
       i = 0
+      cmap = {}
+      @_swatches = []
       while i < pixels.length
         pos = pixels[i]
         pixel = img.pixel_color(pos[0], pos[1]) # 元画像のピクセルを取得
         r = pixel.red / 257
         g = pixel.green / 257
         b = pixel.blue / 257
-        a = pixel.opacity
-        rgb = [r, g, b, a]
-        val = cmap[rgb.join] || [rgb, 0]
-        val[1] += 1
-        cmap[rgb.join] = val
+        a = pixel.opacity / 257
+        if a >= 125 && !(r > 250 and g > 250 and b > 250)
+          rgb = [r, g, b]
+          val = cmap[rgb.join] || [rgb, 0]
+          val[1] += 1
+          cmap[rgb.join] = val
+        end
         i = i + quality
       end
-
-      @_swatches = []
+        
       cmap.each_pair do |key, val|
         @_swatches.push(Swatch.new(val[0], val[1]))
       end
@@ -113,8 +115,8 @@ module Vibrant
         @vibrantSwatch = Swatch.new(Vibrant.hsl2rgb(hsl[0], hsl[1], hsl[2]), 0)
       end
 
-      if @DarkVibrantSwatch.nil? && !@VibrantSwatch.nil?
-        hsl = @VibrantSwatch.getHsl()
+      if @darkVibrantSwatch.nil? && !@vibrantSwatch.nil?
+        hsl = @vibrantSwatch.getHsl()
         hsl[2] = TARGET_DARK_LUMA
         @darkVibrantSwatch = Swatch.new(Vibrant.hsl2rgb(hsl[0], hsl[1], hsl[2]), 0)
       end
