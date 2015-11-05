@@ -24,19 +24,19 @@ module Vibrant
     end
 
     def title_text_color
-      @_ensure_text_colors
+      @ensure_text_colors
       @yiq<200 ? "#fff" : "#000"
     end
 
     def body_text_color
-      @_ensure_text_colors
+      @ensure_text_colors
       @yiq<150 ? "#fff" : "#000"
     end
 
-    def _ensure_text_colors
-      if not @yiq
-        @yiq = (@rgb[0] * 299 + @rgb[1] * 587 + @rgb[2] * 114) / 1000
-      end
+    protected
+
+    def ensure_text_colors
+      @yiq ||= (@rgb[0] * 299 + @rgb[1] * 587 + @rgb[2] * 114) / 1000
     end
 
   end
@@ -66,24 +66,31 @@ module Vibrant
 
     def initialize(sourceImage, color_count: 64, quality: 5)
       @color_count = 64 #color_count
-      @quality = 5 #quality
       @_swatches = []
 
       img = Magick::Image.read(sourceImage)[0].quantize(@color_count)
       cmap = {}
-      # TODO quality
-      for y in 0...img.rows
-        for x in 0...img.columns
-          pixel = img.pixel_color(x, y) # 元画像のピクセルを取得
-          r = pixel.red / 257
-          g = pixel.green / 257
-          b = pixel.blue / 257
-          a = pixel.opacity
-          rgb = [r, g, b, a]
-          val = cmap[rgb.join] || [rgb, 0]
-          val[1] += 1
-          cmap[rgb.join] = val
+      
+      pixels = [] 
+      for y in 0..img.rows
+        for x in 0..img.columns 
+          pixels.push([x, y])
         end
+      end
+
+      i = 0
+      while i < pixels.length
+        pos = pixels[i]
+        pixel = img.pixel_color(pos[0], pos[1]) # 元画像のピクセルを取得
+        r = pixel.red / 257
+        g = pixel.green / 257
+        b = pixel.blue / 257
+        a = pixel.opacity
+        rgb = [r, g, b, a]
+        val = cmap[rgb.join] || [rgb, 0]
+        val[1] += 1
+        cmap[rgb.join] = val
+        i = i + quality
       end
 
       @_swatches = []
@@ -129,7 +136,6 @@ module Vibrant
           end
         end
       end
-
       max
     end
 
@@ -241,9 +247,7 @@ module Vibrant
       end
 
       def hsl2rgb(h, s, l)
-        r = nil
-        g = nil
-        b = nil
+        r = g = b = nil
         if s == 0
           r = g = b = l # achromatic
         else
