@@ -4,7 +4,7 @@ require 'vibrant'
 describe Vibrant::Vibrant do
   describe 'rgb2hsl' do
     it "is 3.jpeg" do
-      vibrant = Vibrant::Vibrant.new('examples/3.jpg')
+      vibrant = Vibrant::Vibrant.new('images/3.jpg')
       swatches = vibrant.swatches
       expect(swatches[:vibrant].hex).to eq '#c73f3d'
       expect(swatches[:muted].hex).to eq '#9a6957'
@@ -16,7 +16,7 @@ describe Vibrant::Vibrant do
   end
 
   it "is octcat" do
-    vibrant = Vibrant::Vibrant.new('examples/octocat.png')
+    vibrant = Vibrant::Vibrant.new('images/octocat.png')
     swatches = vibrant.swatches
     expect(swatches[:vibrant].hex).to eq '#7a4426'
     expect(swatches[:muted].hex).to eq '#7b9eae'
