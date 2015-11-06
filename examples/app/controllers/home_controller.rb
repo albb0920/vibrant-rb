@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
   def index
 
-    @path = Rails.public_path.join('3.jpg')
+    @path = Rails.public_path.join('octocat.png')
 
     vibrant = Vibrant::Vibrant.new(@path, color_count:1024)
 

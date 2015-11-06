@@ -87,9 +87,17 @@ module Vibrant
         g = pixel.green / 257
         b = pixel.blue / 257
         a = pixel.opacity / 257
-        if a >= 125 && !(r > 250 and g > 250 and b > 250)
+        #p pixel.to_s
+
+        # TODO jpegとpngでrgbとrgbaが、混ざってる
+
+        #if a >= 125 && !(r > 250 and g > 250 and b > 250)
+        if !(r > 250 and g > 250 and b > 250)
           rgb = [r, g, b]
           val = cmap[rgb.join] || [rgb, 0]
+
+          # 本当はここでquantizeしたい
+
           val[1] += 1
           cmap[rgb.join] = val
         end
@@ -121,7 +129,6 @@ module Vibrant
         hsl[2] = TARGET_DARK_LUMA
         @darkVibrantSwatch = Swatch.new(Vibrant.hsl2rgb(hsl[0], hsl[1], hsl[2]), 0)
       end
-
     end
 
     def find_color_variation(targetLuma, minLuma, maxLuma, targetSaturation, minSaturation, maxSaturation)
@@ -139,18 +146,14 @@ module Vibrant
           end
         end
       end
-      p 'max', max
       max
     end
 
     def create_comparison_value(saturation, targetSaturation, luma, targetLuma, population, maxPopulation)
       self.weightedMean([
-                            invert_diff(saturation, targetSaturation),
-                            WEIGHT_SATURATION,
-                            self.invert_diff(luma, targetLuma),
-                            WEIGHT_LUMA,
-                            (population / maxPopulation),
-                            WEIGHT_POPULATION
+                            [invert_diff(saturation, targetSaturation), WEIGHT_SATURATION],
+                            [invert_diff(luma, targetLuma), WEIGHT_LUMA],
+                            [(population / maxPopulation), WEIGHT_POPULATION]
                         ])
     end
 
@@ -161,13 +164,11 @@ module Vibrant
     def weightedMean(values)
       sum = 0
       sumWeight = 0
-      i = 0
-      while i < values.length
-        value = values[i]
-        weight = values[i + 1]
+      values.each do |v|
+        value = v[0]
+        weight = v[1]
         sum += value * weight
         sumWeight += weight
-        i += 2
       end
       sum / sumWeight
     end
