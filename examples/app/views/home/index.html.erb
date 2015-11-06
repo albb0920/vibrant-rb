@@ -1,8 +1,4 @@
 <p><%= @path %><p/>
-<%= @swatches %>
-<p>vibrant: <%= @vibrant %></p>
-<p>@muted: <%= @muted %></p>
-<p>dark_vibrant: <%= @dark_vibrant%></p>
-<p>dark_muted: <%= @dark_muted%></p>
-<p>light_vibrant: <%= @light_vibrant%></p>
-<p>light_muted: <%= @light_muted%></p>
+<% @swatches.each do |k, v| %>
+<p style="background-color: <%= v.try(:hex) %>"><%= k %>: <%= v.try(:hex) %></p>
+<% end %>

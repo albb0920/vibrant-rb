@@ -65,7 +65,6 @@ module Vibrant
     @@highestPopulation = 0
 
     def initialize(sourceImage, color_count: 64, quality: 5)
-      p 'init 1'
       @color_count = color_count
       @_swatches = []
 
@@ -88,8 +87,7 @@ module Vibrant
         g = pixel.green / 257
         b = pixel.blue / 257
         a = pixel.opacity / 257
-        #if a >= 125 && !(r > 250 and g > 250 and b > 250)
-        if !(r > 250 and g > 250 and b > 250)
+        if a >= 125 && !(r > 250 and g > 250 and b > 250)
           rgb = [r, g, b]
           val = cmap[rgb.join] || [rgb, 0]
           val[1] += 1
@@ -99,7 +97,7 @@ module Vibrant
       end
 
       cmap.each_pair do |key, val|
-        p "#{val[0]}: #{val[1]}"
+        #p "#{val[0]}: #{val[1]}"
         @_swatches.push(Swatch.new(val[0], val[1]))
       end
 
