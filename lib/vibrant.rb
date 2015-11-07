@@ -11,7 +11,6 @@ module Vibrant
       @population = population
       @rgb = rgb
       @hsl = nil
-      @population = 1
       @yiq = 0
     end
 
@@ -43,14 +42,14 @@ module Vibrant
 
   class Vibrant
 
-    TARGET_DARK_LUMA = 0.26
-    MAX_DARK_LUMA = 0.45
-    MIN_LIGHT_LUMA = 0.55
-    TARGET_LIGHT_LUMA = 0.74
+    TARGET_DARK_LUNA = 0.26
+    MAX_DARK_LUNA = 0.45
+    MIN_LIGHT_LUNA = 0.55
+    TARGET_LIGHT_LUNA = 0.74
 
-    MIN_NORMAL_LUMA = 0.3
-    TARGET_NORMAL_LUMA = 0.5
-    MAX_NORMAL_LUMA = 0.7
+    MIN_NORMAL_LUNA = 0.3
+    TARGET_NORMAL_LUNA = 0.5
+    MAX_NORMAL_LUNA = 0.7
 
     TARGET_MUTED_SATURATION = 0.3
     MAX_MUTED_SATURATION = 0.4
@@ -58,8 +57,30 @@ module Vibrant
     TARGET_VIBRANT_SATURATION = 1
     MIN_VIBRANT_SATURATION = 0.35
 
+    NORMAL_LUNA = {
+        target: TARGET_NORMAL_LUNA,
+        range: MIN_NORMAL_LUNA..MAX_NORMAL_LUNA
+    }
+    LIGHT_LUNA = {
+        target: TARGET_LIGHT_LUNA,
+        range: MIN_LIGHT_LUNA..1
+    }
+    DARK_LUNA = {
+        target: TARGET_DARK_LUNA,
+        range: 0..MAX_DARK_LUNA
+    }
+
+    VIBRANT_SATURATION = {
+        target: TARGET_VIBRANT_SATURATION,
+        range: MIN_VIBRANT_SATURATION..1
+    }
+    MUTED_SATURATION  = {
+        target: TARGET_MUTED_SATURATION,
+        range: 0..MAX_MUTED_SATURATION
+    }
+
     WEIGHT_SATURATION = 3
-    WEIGHT_LUMA = 6
+    WEIGHT_LUNA = 6
     WEIGHT_POPULATION = 1
 
     @@highestPopulation = 0
@@ -87,7 +108,6 @@ module Vibrant
         g = pixel.green / 257
         b = pixel.blue / 257
         a = pixel.opacity / 257
-        #p pixel.to_s
 
         # TODO jpegとpngでrgbとrgbaが、混ざってる
 
@@ -105,55 +125,58 @@ module Vibrant
       end
 
       cmap.each_pair do |key, val|
-        #p "#{val[0]}: #{val[1]}"
         @_swatches.push(Swatch.new(val[0], val[1]))
       end
 
       @maxPopulation = @_swatches.collect(&:population).max
 
-      @vibrantSwatch = find_color_variation(TARGET_NORMAL_LUMA, MIN_NORMAL_LUMA, MAX_NORMAL_LUMA, TARGET_VIBRANT_SATURATION, MIN_VIBRANT_SATURATION, 1)
-      @lightVibrantSwatch = find_color_variation(TARGET_LIGHT_LUMA, MIN_LIGHT_LUMA, 1, TARGET_VIBRANT_SATURATION, MIN_VIBRANT_SATURATION, 1)
-      @darkVibrantSwatch = find_color_variation(TARGET_DARK_LUMA, 0, MAX_DARK_LUMA, TARGET_VIBRANT_SATURATION, MIN_VIBRANT_SATURATION, 1)
-      @mutedSwatch = find_color_variation(TARGET_NORMAL_LUMA, MIN_NORMAL_LUMA, MAX_NORMAL_LUMA, TARGET_MUTED_SATURATION, 0, MAX_MUTED_SATURATION)
-      @lightMutedSwatch = find_color_variation(TARGET_LIGHT_LUMA, MIN_LIGHT_LUMA, 1, TARGET_MUTED_SATURATION, 0, MAX_MUTED_SATURATION)
-      @darkMutedSwatch = find_color_variation(TARGET_DARK_LUMA, 0, MAX_DARK_LUMA, TARGET_MUTED_SATURATION, 0, MAX_MUTED_SATURATION)
+      @vibrantSwatch = find_color_variation(NORMAL_LUNA, VIBRANT_SATURATION)
+      @lightVibrantSwatch = find_color_variation(LIGHT_LUNA,VIBRANT_SATURATION)
+      @darkVibrantSwatch = find_color_variation(DARK_LUNA, VIBRANT_SATURATION)
+      @mutedSwatch = find_color_variation(NORMAL_LUNA, MUTED_SATURATION)
+      @lightMutedSwatch = find_color_variation(LIGHT_LUNA, MUTED_SATURATION)
+      @darkMutedSwatch = find_color_variation(DARK_LUNA, MUTED_SATURATION)
 
       if @vibrantSwatch.nil? && !@darkVibrantSwatch.nil?
         hsl = @DarkVibrantSwatch.getHsl()
-        hsl[2] = TARGET_NORMAL_LUMA
+        hsl[2] = TARGET_NORMAL_LUNA
         @vibrantSwatch = Swatch.new(Vibrant.hsl2rgb(hsl[0], hsl[1], hsl[2]), 0)
       end
 
       if @darkVibrantSwatch.nil? && !@vibrantSwatch.nil?
         hsl = @vibrantSwatch.getHsl()
-        hsl[2] = TARGET_DARK_LUMA
+        hsl[2] = TARGET_DARK_LUNA
         @darkVibrantSwatch = Swatch.new(Vibrant.hsl2rgb(hsl[0], hsl[1], hsl[2]), 0)
       end
+
     end
 
-    def find_color_variation(targetLuma, minLuma, maxLuma, targetSaturation, minSaturation, maxSaturation)
+    def find_color_variation(luna, saturation)
       max = nil
       maxValue = 0
+      
       @_swatches.each do |swatch|
-        sat = swatch.hsl[1]
-        luma = swatch.hsl[2]
-        if sat.between?(minSaturation, maxSaturation) &&
-            luma.between?(minLuma, maxLuma) && !already_selected?(swatch)
-          value = create_comparison_value(sat, targetSaturation, luma, targetLuma, swatch.population, @maxPopulation)
+        s = swatch.hsl[1]
+        l = swatch.hsl[2]
+
+        if luna[:range].include?(l) && saturation[:range].include?(s) && !already_selected?(swatch)
+          value = create_comparison_value(s, saturation[:target], l, luna[:target], swatch.population, @maxPopulation)
+
           if max.nil? || value > maxValue
             max = swatch
             maxValue = value
           end
         end
       end
+
       max
     end
 
-    def create_comparison_value(saturation, targetSaturation, luma, targetLuma, population, maxPopulation)
+    def create_comparison_value(saturation, targetSaturation, luna, target_luna, population, max_population)
       self.weightedMean([
                             [invert_diff(saturation, targetSaturation), WEIGHT_SATURATION],
-                            [invert_diff(luma, targetLuma), WEIGHT_LUMA],
-                            [(population / maxPopulation), WEIGHT_POPULATION]
+                            [invert_diff(luna, target_luna), WEIGHT_LUNA],
+                            [(population / max_population), WEIGHT_POPULATION]
                         ])
     end
 
@@ -180,7 +203,7 @@ module Vibrant
           dark_vibrant: @darkVibrantSwatch,
           dark_muted: @darkMutedSwatch,
           light_vibrant: @lightVibrantSwatch,
-          light_muted: @lightMuted
+          light_muted: @lightMutedSwatch
       }
     end
 

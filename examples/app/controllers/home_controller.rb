@@ -3,7 +3,7 @@ class HomeController < ApplicationController
 
     @path = Rails.public_path.join('octocat.png')
 
-    vibrant = Vibrant::Vibrant.new(@path, color_count:1024)
+    vibrant = Vibrant::Vibrant.new(@path, color_count:64)
 
     @swatches = vibrant.swatches
 
@@ -13,5 +13,6 @@ class HomeController < ApplicationController
     @dark_muted = @swatches[:dark_muted].try(:hex)
     @light_vibrant = @swatches[:light_vibrant].try(:hex)
     @light_muted = @swatches[:light_muted].try(:hex)
+
   end
 end
