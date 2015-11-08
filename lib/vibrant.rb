@@ -1,4 +1,4 @@
-#require "vibrant/version"
+require "vibrant/version"
 require "rmagick"
 
 module Vibrant
@@ -154,7 +154,7 @@ module Vibrant
     def find_color_variation(luna, saturation)
       max = nil
       maxValue = 0
-      
+
       @_swatches.each do |swatch|
         s = swatch.hsl[1]
         l = swatch.hsl[2]
