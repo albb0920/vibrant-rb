@@ -85,12 +85,23 @@ module Vibrant
 
     @@highestPopulation = 0
 
-    def initialize(sourceImage, color_count: 64, quality: 5)
+    def read(sourceImage, color_count: 64, quality: 5)
+      @img = Magick::Image.from_blob(sourceImage.read).file.quantize(@color_count)
+      @process
+    end
+
+    def read_file(sourceImage, color_count: 64, quality: 5)
+      @img = Magick::Image.read(sourceImage).first.quantize(@color_count)
+      @process
+    end
+
+    def process
+
       @color_count = color_count
       @_swatches = []
-
-      img = Magick::Image.read(sourceImage)[0].quantize(@color_count)
       
+      img = @img
+
       pixels = [] 
       for y in 0..img.rows
         for x in 0..img.columns 
