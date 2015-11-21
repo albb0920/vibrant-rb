@@ -121,6 +121,7 @@ module Vibrant
         a = pixel.opacity / 257
 
         # TODO jpegとpngでrgbとrgbaが、混ざってる
+        # TODO histogramで対応する
 
         #if a >= 125 && !(r > 250 and g > 250 and b > 250)
         if !(r > 250 and g > 250 and b > 250)
