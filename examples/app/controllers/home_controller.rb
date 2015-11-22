@@ -1,18 +1,19 @@
 class HomeController < ApplicationController
   def index
 
-    @path = Rails.public_path.join('octocat.png')
+    @types = [
+        :vibrant, :muted,
+        :dark_vibrant,
+        :dark_muted,
+        :light_vibrant,
+        :light_muted
+    ]
 
-    vibrant = Vibrant::Vibrant.new(@path, color_count:64)
+    @png_path ='octocat.png'
+    @png_vibrant = Vibrant.read(Rails.public_path.join(@png_path))
 
-    @swatches = vibrant.swatches
-
-    @vibrant      = @swatches[:vibrant].try(:hex)
-    @muted        = @swatches[:muted].try(:hex)
-    @dark_vibrant = @swatches[:dark_vibrant].try(:hex)
-    @dark_muted = @swatches[:dark_muted].try(:hex)
-    @light_vibrant = @swatches[:light_vibrant].try(:hex)
-    @light_muted = @swatches[:light_muted].try(:hex)
+    @jpg_path = '1.jpg'
+    @jpg_vibrant = Vibrant.read(Rails.public_path.join(@jpg_path))
 
   end
 end

@@ -110,7 +110,7 @@ module Vibrant
         #h = swatch.hsla[0] / 360
         s = swatch.hsla[1] / 255
         l = swatch.hsla[2] / 255
-        
+
         if luna[:range].include?(l) && saturation[:range].include?(s) && !already_selected?(swatch)
 
           value = create_comparison_value(s, saturation[:target], l, luna[:target], swatch.population, @maxPopulation)

@@ -1,4 +1,26 @@
-<p><%= @path %><p/>
-<% @swatches.each do |k, v| %>
-<p style="background-color: <%= v.try(:hex) %>"><%= k %>: <%= v.try(:hex) %></p>
-<% end %>
+
+<div>
+  <h3>PNG</h3>
+  <img src="<%= @png_path %>" height="200px"></img>
+  <div>
+    <% @types.each do |type| %>
+    <span style="background-color: <%= @png_vibrant.try(type).hex %>; padding: 8px;">
+      <%= type%> : <%= @png_vibrant.try(type).hex %>
+    </span>
+    <% end %>
+  </div>
+
+</div>
+
+<div>
+  <h3>JPG</h3>
+  <img src="<%= @jpg_path %>" height="200px"></img>
+  <div>
+    <% @types.each do |type| %>
+    <span style="background-color: <%= @jpg_vibrant.try(type).hex %>; padding: 8px;">
+      <%= type%> : <%= @jpg_vibrant.try(type).hex %>
+    </span>
+    <% end %>
+  </div>
+
+</div>
