@@ -8,6 +8,16 @@ require 'vibrant/vibrant'
 
 module Vibrant
 
+  def self.read_with_temp(file, temp_basename: ['vibrant'], tempdir: Dir::tmpdir, color_count: 64, quality: 5)
+    Tempfile.create(temp_basename, tempdir) do |tempfile|
+      tempfile.write(file.read)
+      file.read do |chunk|
+        tempfile.write(chunk)
+      end
+      read(tempfile)
+    end
+  end
+
   def self.read(sourceImage, color_count: 64, quality: 5)
     Vibrant.new(sourceImage, color_count: color_count, quality:quality).swatches
   end
