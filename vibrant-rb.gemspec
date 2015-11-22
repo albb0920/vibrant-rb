@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'vibrant/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "vibrant-rb"
+  spec.name          = "vibrant"
   spec.version       = Vibrant::VERSION
   spec.authors       = ["dondoco7"]
   spec.email         = ["dondoco7@gmail.com"]
