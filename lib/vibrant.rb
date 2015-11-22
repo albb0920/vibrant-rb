@@ -25,6 +25,7 @@ module Vibrant
 
   def self._read_with_temp(file, color_count: 64, quality: 5)
     Tempfile.open(['vibrant']) do |tempfile|
+      tempfile.binmode
       tempfile.write(file.read)
       read(tempfile.path)
     end
