@@ -120,7 +120,6 @@ module Vibrant
           end
         end
       end
-      p max
 
       max
     end
