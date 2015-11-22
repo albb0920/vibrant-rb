@@ -11,7 +11,7 @@ TODO: Delete this and the text above, and describe your gem
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'vibrant-rb'
+gem 'vibrant'
 ```
 
 And then execute:
@@ -20,21 +20,10 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install vibrant-rb
+    $ gem install vibrant
 
 ## Usage
 
-### Install
-
-```
-gem install vibrant
-```
-or 
-```
-gem 'vibrant'
-```
-
-### Use
 ```
 
 # path or file
@@ -48,7 +37,6 @@ dark_muted = vibrant.dark_muted.hex
 light_vibrant = vibrant.light_vibrant.hex
 light_muted = vibrant.light_muted.hex
 ```
-TODO: Write usage instructions here
 
 ## Development
 
