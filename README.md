@@ -24,6 +24,23 @@ Or install it yourself as:
 
 ## Usage
 
+### Install
+
+```
+gem install vibrant
+```
+or 
+```
+gem 'vibrant'
+```
+
+### Use
+```
+vibrant = Vibrant.read('images/octocat.png')
+vibrant = vibrant.vibrant.hex
+muted = vibrant.muted.hex
+
+```
 TODO: Write usage instructions here
 
 ## Development
