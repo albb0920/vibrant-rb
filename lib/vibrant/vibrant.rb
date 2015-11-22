@@ -54,13 +54,7 @@ module Vibrant
     def initialize(sourceImage, color_count: 64, quality: 5)
       @color_count = color_count
       @quality = quality
-
-      @image = if sourceImage.kind_of?(String)
-                 Magick::Image.read(sourceImage).first.quantize(@color_count)
-               else
-
-               end
-
+      @image = Magick::Image.read(sourceImage).first.quantize(@color_count)
       process
     end
 
@@ -68,43 +62,22 @@ module Vibrant
 
       @_swatches = []
 
-      pixels = []
-      for y in 0..@image.rows
-        for x in 0..@image.columns
-          pixels.push([x, y])
-        end
-      end
+      # histogram
+      histogram = @image.color_histogram.inject({}) { |h, pair|
+        hex = pair[0].to_color(Magick::AllCompliance, false, 8, true)
+        hsla = pair[0].to_hsla
+        count = pair[1]
 
-      i = 0
-      cmap = {}
-      @_swatches = []
-      while i < pixels.length
-        pos = pixels[i]
-        pixel = @image.pixel_color(pos[0], pos[1]) # 元画像のピクセルを取得
-        r = pixel.red / 257
-        g = pixel.green / 257
-        b = pixel.blue / 257
-        a = pixel.opacity / 257
-
-        # TODO jpegとpngでrgbとrgbaが、混ざってる
-        # TODO histogramで対応する
-
-        #if a >= 125 && !(r > 250 and g > 250 and b > 250)
-        if !(r > 250 and g > 250 and b > 250)
-          rgb = [r, g, b]
-          val = cmap[rgb.join] || [rgb, 0]
-
-          # 本当はここでquantizeしたい
-
-          val[1] += 1
-          cmap[rgb.join] = val
-        end
-        i = i + @quality
-      end
-
-      cmap.each_pair do |key, val|
-        @_swatches.push(Swatch.new(val[0], val[1]))
-      end
+        h[hex] ||= {
+            hex: hex,
+            hsla: hsla,
+            count: 0
+        }
+        h[hex][:count] += count
+        h
+      }.each_pair { |key, val|
+        @_swatches.push(Swatch.new(val[:hex], val[:hsla], val[:count]))
+      }
 
       @maxPopulation = @_swatches.collect(&:population).max
 
@@ -116,15 +89,15 @@ module Vibrant
       @darkMutedSwatch = find_color_variation(DARK_LUNA, MUTED_SATURATION)
 
       if @vibrantSwatch.nil? && !@darkVibrantSwatch.nil?
-        hsl = @DarkVibrantSwatch.getHsl()
-        hsl[2] = TARGET_NORMAL_LUNA
-        @vibrantSwatch = Swatch.new(::Vibrant.hsl2rgb(hsl[0], hsl[1], hsl[2]), 0)
+        hsla = @DarkVibrantSwatch.hsla.dup
+        hsla[2] = TARGET_NORMAL_LUNA
+        @vibrantSwatch = Swatch.new(@DarkVibrantSwatch.hex, hsla, 0)
       end
 
       if @darkVibrantSwatch.nil? && !@vibrantSwatch.nil?
-        hsl = @vibrantSwatch.getHsl()
-        hsl[2] = TARGET_DARK_LUNA
-        @darkVibrantSwatch = Swatch.new(hsl2rgb(hsl[0], hsl[1], hsl[2]), 0)
+        hsla = @vibrantSwatch.hsla.dup
+        hsla[2] = TARGET_DARK_LUNA
+        @darkVibrantSwatch = Swatch.new(@vibrantSwatch.hex, hsla, 0)
       end
 
     end
@@ -134,9 +107,12 @@ module Vibrant
       maxValue = 0
 
       @_swatches.each do |swatch|
-        s = swatch.hsl[1]
-        l = swatch.hsl[2]
+        #h = swatch.hsla[0] / 360
+        s = swatch.hsla[1] / 255
+        l = swatch.hsla[2] / 255
+        
         if luna[:range].include?(l) && saturation[:range].include?(s) && !already_selected?(swatch)
+
           value = create_comparison_value(s, saturation[:target], l, luna[:target], swatch.population, @maxPopulation)
           if max.nil? || value > maxValue
             max = swatch
@@ -144,16 +120,17 @@ module Vibrant
           end
         end
       end
+      p max
 
       max
     end
 
     def create_comparison_value(saturation, targetSaturation, luna, target_luna, population, max_population)
       self.class.weightedMean([
-                       [self.class.invert_diff(saturation, targetSaturation), WEIGHT_SATURATION],
-                       [self.class.invert_diff(luna, target_luna), WEIGHT_LUNA],
-                       [(population / max_population), WEIGHT_POPULATION]
-                   ])
+                                  [self.class.invert_diff(saturation, targetSaturation), WEIGHT_SATURATION],
+                                  [self.class.invert_diff(luna, target_luna), WEIGHT_LUNA],
+                                  [(population / max_population), WEIGHT_POPULATION]
+                              ])
     end
 
 
