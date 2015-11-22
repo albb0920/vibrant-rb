@@ -36,10 +36,17 @@ gem 'vibrant'
 
 ### Use
 ```
+
+# path or file
 vibrant = Vibrant.read('images/octocat.png')
+
+# get colors
 vibrant = vibrant.vibrant.hex
 muted = vibrant.muted.hex
-
+dark_vibrant = vibrant.dark_vibrant.hex
+dark_muted = vibrant.dark_muted.hex
+light_vibrant = vibrant.light_vibrant.hex
+light_muted = vibrant.light_muted.hex
 ```
 TODO: Write usage instructions here
 
