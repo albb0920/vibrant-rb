@@ -2,7 +2,8 @@ class HomeController < ApplicationController
   def index
 
     @types = [
-        :vibrant, :muted,
+        :vibrant,
+        :muted,
         :dark_vibrant,
         :dark_muted,
         :light_vibrant,
