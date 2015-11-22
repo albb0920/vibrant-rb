@@ -1,4 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/vibrant-rb.svg)](https://badge.fury.io/rb/vibrant-rb)
+[![Gem Version](https://badge.fury.io/rb/vibrant.svg)](https://badge.fury.io/rb/vibrant)
 
 # Vibrant
 
