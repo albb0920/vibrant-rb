@@ -89,9 +89,9 @@ module Vibrant
       @darkMutedSwatch = find_color_variation(DARK_LUNA, MUTED_SATURATION)
 
       if @vibrantSwatch.nil? && !@darkVibrantSwatch.nil?
-        hsla = @DarkVibrantSwatch.hsla.dup
+        hsla = @darkVibrantSwatch.hsla.dup
         hsla[2] = TARGET_NORMAL_LUNA
-        @vibrantSwatch = Swatch.new(@DarkVibrantSwatch.hex, hsla, 0)
+        @vibrantSwatch = Swatch.new(@darkVibrantSwatch.hex, hsla, 0)
       end
 
       if @darkVibrantSwatch.nil? && !@vibrantSwatch.nil?
