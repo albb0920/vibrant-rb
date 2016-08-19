@@ -90,14 +90,28 @@ module Vibrant
 
       if @vibrantSwatch.nil? && !@darkVibrantSwatch.nil?
         hsla = @darkVibrantSwatch.hsla.dup
-        hsla[2] = TARGET_NORMAL_LUNA
-        @vibrantSwatch = Swatch.new(@darkVibrantSwatch.hex, hsla, 0)
+        hsla[2] = TARGET_NORMAL_LUNA * 100
+        @vibrantSwatch = Swatch.new(Color::HSL.new(hsla[0], hsla[1], hsla[2]).html, hsla, 0)
       end
 
       if @darkVibrantSwatch.nil? && !@vibrantSwatch.nil?
         hsla = @vibrantSwatch.hsla.dup
-        hsla[2] = TARGET_DARK_LUNA
-        @darkVibrantSwatch = Swatch.new(@vibrantSwatch.hex, hsla, 0)
+        hsla[2] = TARGET_DARK_LUNA * 100
+        @darkVibrantSwatch = Swatch.new(Color::HSL.new(hsla[0], hsla[1], hsla[2]).html, hsla, 0)
+      end
+
+      if @lightMutedSwatch.nil? && !@mutedSwatch.nil?
+        hsla = @mutedSwatch.hsla.dup
+        hsla[1] = 0
+        hsla[2] = MIN_LIGHT_LUNA * 100
+        @lightMutedSwatch = Swatch.new(Color::HSL.new(hsla[0], hsla[1], hsla[2]).html, hsla, 0)
+      end
+
+      if @darkMutedSwatch.nil? && !@mutedSwatch.nil?
+        hsla = @mutedSwatch.hsla.dup
+        hsla[1] = MAX_MUTED_SATURATION
+        hsla[2] = MAX_DARK_LUNA * 100
+        @darkMutedSwatch = Swatch.new(Color::HSL.new(hsla[0], hsla[1], hsla[2]).html, hsla, 0)
       end
 
     end
@@ -107,12 +121,10 @@ module Vibrant
       maxValue = 0
 
       @_swatches.each do |swatch|
-        #h = swatch.hsla[0] / 360
         s = swatch.hsla[1] / 255
         l = swatch.hsla[2] / 255
 
         if luna[:range].include?(l) && saturation[:range].include?(s) && !already_selected?(swatch)
-
           value = create_comparison_value(s, saturation[:target], l, luna[:target], swatch.population, @maxPopulation)
           if max.nil? || value > maxValue
             max = swatch

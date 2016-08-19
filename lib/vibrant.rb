@@ -3,6 +3,7 @@
 require 'vibrant/version'
 require 'rmagick'
 require 'tempfile'
+require 'color'
 
 require 'vibrant/swatch'
 require 'vibrant/vibrant'
